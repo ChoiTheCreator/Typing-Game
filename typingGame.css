@@ -2,64 +2,58 @@
   margin: 0;
   padding: 0;
 }
-/* 가운데 정렬 (바디 태그 전체) */
+
 body {
   display: flex;
-  /* 오뎅꼬치의 방향 정하기 */
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
+
 .header {
   width: 100%;
   background-color: #3b5999;
-  color: white;
+  color: #fff;
   text-align: center;
   padding: 1rem;
 }
-.word-displayment {
-  font-size: 25px;
+
+.word-display {
   margin-top: 3rem;
+  font-size: 80px;
   color: #3b5999;
 }
 
-.word-inputbox {
-  margin-top: 3rem;
+.word-input-box {
+  margin-top: 2rem;
 }
 
 .word-input {
-  width: 15rem;
-  padding: 15px;
+  padding: 0.5rem;
+  width: 300px;
 }
+
 .game-info {
-  /* 이 컨테이너에 크기를 먼저 지정하지 않으면
-  display flex 후 content 배치할때
-  즉 justify-content 할때 작동이 안됌
-  따라서 크기를 먼저 지정*/
-  width: 65%;
+  margin-top: 2rem;
+  font-size: 14px;
   display: flex;
   justify-content: space-between;
+  width: 200px;
 }
-.time-num,
+.time,
 .score {
-  color: #3b5999;
   font-size: 30px;
-  margin-right: 5px;
 }
-/* 버튼은 클래스 두개 붙여서 활용
-1. 클릭되기 전 (실행되기전)
-2. 클릭 된 후 (실행되는중)*/
-.game-btn {
-  margin-top: 15px;
-  height: 30px;
-  width: 150px;
-  color: white;
+.button {
+  width: 200px;
+  height: 35px;
   background-color: #3b5999;
+  color: #fff;
   border: none;
+  margin-top: 3rem;
   cursor: pointer;
 }
-.game-loading {
-  /* 로딩중에는 클릭을 허용하지 않는다. */
-  cursor: not-allowed;
-  background-color: gray;
+
+.loading {
+  background-color: #ccc;
 }

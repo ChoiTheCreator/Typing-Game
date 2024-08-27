@@ -1,76 +1,93 @@
-//사용 변수 설정
-let wordInput = $('.word-input');
-let wordDisplay = $('.word-displayment');
-
-// 점수 관련  변수
+const GAME_TIME = 9;
 let score = 0;
-let scoreDisplay = $('.score');
-
-//게임 진행 상황
-let isplaying = false;
-
-//시간 관련 변수
-let timeDisplay = $('.time-num');
-let initTime = 9;
-
-//버튼 관련 변수
-const btnDisplay = $('.game-btn');
-
-//시간 인터벌 변수 (타이머 객체)
+let time = GAME_TIME;
+let isPlaying = false;
 let timeInterval;
+let checkInterval;
+let words = [];
 
-//#1. display text와 input text 비교 + 맞다면 점수 부여.
-wordInput.on('input', function () {
-  console.log(
-    wordInput.val().toLowerCase() == wordDisplay.text().toLowerCase()
-  );
+const wordInput = document.querySelector('.word-input');
+const wordDisplay = document.querySelector('.word-display');
+const scoreDisplay = document.querySelector('.score');
+const timeDisplay = document.querySelector('.time');
+const button = document.querySelector('.button');
 
-  if (wordInput.val().toLowerCase() == wordDisplay.text().toLowerCase()) {
-    score++;
-    scoreDisplay.html(score);
-    wordInput = ' ';
-  }
-});
+init();
 
-//#2. 남은 시간대를 다루자.
-function countDown() {
-  initTime > 0 ? initTime-- : (isplaying = false);
-  if (!isplaying) {
-    //타이머 클리어
-    clearInterval(timeInterval);
-  }
-  // 실시간으로 시간의 변화를 찍혀나와야하니까
-  timeDisplay.html(initTime);
+function init() {
+  buttonChange('게임로딩중...');
+  getWords();
+  wordInput.addEventListener('input', checkMatch);
 }
 
-//#3. 시작버튼을 누를시의 대한 변화를 다루자.
-
-//html 버튼에다가 온클릭시 실행되게 설계한 함수 + 타이머 생성함수
-
+//게임 실행
 function run() {
-  isplaying = true;
-  //콜백 함수 countDown 활용
+  if (isPlaying) {
+    return;
+  }
+  isPlaying = true;
+  time = GAME_TIME;
+  wordInput.focus(); //얘 위치를 if문 위에 둬야할듯
+  scoreDisplay.innerText = 0;
   timeInterval = setInterval(countDown, 1000);
+  checkInterval = setInterval(checkStatus, 50);
+  buttonChange('게임중');
+}
+
+function checkStatus() {
+  if (!isPlaying && time === 0) {
+    buttonChange('게임시작');
+    clearInterval(checkInterval);
+  }
+}
+
+//단어 불러오기
+function getWords() {
+  // Make a request for a user with a given ID
+  axios
+    .get('https://random-word-api.herokuapp.com/word?number=100')
+    .then(function (response) {
+      // handle success
+      response.data.forEach((word) => {
+        if (word.length < 10) {
+          words.push(word);
+        }
+      });
+      buttonChange('게임시작');
+      console.log(words);
+    })
+    .catch(function (error) {
+      // handle error
+      console.log(error);
+    });
+}
+
+//단어 일치 체크
+function checkMatch() {
+  if (wordInput.value.toLowerCase() === wordDisplay.innerText.toLowerCase()) {
+    wordInput.value = '';
+    if (!isPlaying) {
+      return;
+    }
+    score++;
+    scoreDisplay.innerText = score;
+    time = GAME_TIME;
+    const randomIndex = Math.floor(Math.random() * words.length);
+    wordDisplay.innerText = words[randomIndex];
+  }
+}
+
+function countDown() {
+  time > 0 ? time-- : (isPlaying = false);
+  timeDisplay.innerText = time;
+  if (!isPlaying) {
+    clearInterval(timeInterval);
+  }
 }
 
 function buttonChange(text) {
-  btnDisplay.html(text);
-  if (text === '게임시작') {
-    btnDisplay.removeClass('game-loading');
-  } else {
-    btnDisplay.addClass('game-loading');
-  }
+  button.innerText = text;
+  text === '게임시작'
+    ? button.classList.remove('loading')
+    : button.classList.add('loading');
 }
-buttonChange('게임시작');
-
-// 버튼 클릭 이벤트 추가
-btnDisplay.on('click', function () {
-  if (!isplaying) {
-    initTime = 9; // 게임 시작 시 시간 초기화
-    score = 0; // 점수 초기화
-    scoreDisplay.html(score); // 점수 표시 초기화
-    wordInput.val(''); // 입력 필드 초기화
-    run(); // 게임 시작
-    buttonChange('게임진행중'); // 버튼 텍스트 변경
-  }
-});
